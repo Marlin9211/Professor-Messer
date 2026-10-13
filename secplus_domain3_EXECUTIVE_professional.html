@@ -1,0 +1,1097 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Security+ Interactive Learning System — Domain 3</title>
+<style>
+/* ── Design Tokens ─────────────────────────────────────────────────────── */
+:root{
+  --rust:#7b2d21;--rust2:#9a3d2d;--rust-light:#f5e6e2;--rust-xlight:#fdf4f2;
+  --ink:#1f2933;--ink2:#374151;--muted:#64748b;--muted2:#94a3b8;
+  --bg:#f4f1ed;--card:#ffffff;
+  --blue:#e8f2fb;--blue-dark:#1a5fa8;
+  --yellow:#fff6d8;--yellow-dark:#92700a;
+  --green:#e8f7ed;--green-dark:#176b3a;
+  --line:#e2e8f0;--line2:#cbd5e1;
+  --radius-sm:.5rem;--radius:.75rem;--radius-lg:1rem;--radius-xl:1.5rem;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08);
+  --shadow:0 4px 12px rgba(0,0,0,.10);
+  --shadow-lg:0 8px 24px rgba(0,0,0,.12);
+  --transition:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;font-size:15px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #4f8cc9;outline-offset:2px}
+h1,h2,h3,h4{line-height:1.3;color:var(--ink)}
+p{color:var(--ink2)}
+
+/* ── Top Navigation ────────────────────────────────────────────────────── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,.97);
+  backdrop-filter:blur(8px);
+  border-bottom:2px solid var(--rust);
+  display:flex;gap:.5rem;align-items:center;
+  padding:.65rem 1.25rem;flex-wrap:wrap;
+  box-shadow:var(--shadow-sm);
+}
+.brand{
+  font-weight:800;font-size:1.05rem;color:var(--rust);
+  margin-right:auto;letter-spacing:-.3px;
+  display:flex;align-items:center;gap:.5rem;
+}
+.brand::before{
+  content:'🔐';font-size:1.1rem;
+}
+.navbtn{
+  border:1.5px solid var(--line2);background:#fff;
+  border-radius:var(--radius-sm);padding:.5rem .9rem;
+  font-size:.85rem;font-weight:600;color:var(--muted);
+  transition:all var(--transition);
+}
+.navbtn:hover{border-color:var(--rust);color:var(--rust);background:var(--rust-xlight)}
+.navbtn.active{background:var(--rust);color:#fff;border-color:var(--rust);box-shadow:0 2px 8px rgba(123,45,33,.3)}
+
+/* ── Layout ────────────────────────────────────────────────────────────── */
+main{max-width:1280px;margin:0 auto;padding:1.5rem 1.25rem}
+.screen{display:none}
+.screen.active{display:block}
+
+/* ── Start / Hero ──────────────────────────────────────────────────────── */
+.hero{
+  background:linear-gradient(135deg,#fff 60%,var(--rust-xlight) 100%);
+  border:1px solid var(--line);
+  border-left:6px solid var(--rust);
+  padding:2.5rem 2rem;border-radius:var(--radius-xl);
+  margin-top:1.5rem;box-shadow:var(--shadow);
+}
+.hero-badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.hero h1{font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:800;color:var(--ink);margin-bottom:.4rem}
+.hero h2{font-size:1.1rem;font-weight:600;color:var(--rust);margin-bottom:.75rem}
+.hero p{color:var(--ink2);max-width:680px;margin-bottom:.4rem}
+.hero .sub{color:var(--muted);font-size:.9rem}
+.hero-cta{
+  margin-top:1.5rem;
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:var(--rust);color:#fff;
+  border:none;border-radius:var(--radius);
+  padding:.85rem 1.75rem;font-size:1rem;font-weight:700;
+  box-shadow:0 4px 14px rgba(123,45,33,.35);
+  transition:all var(--transition);
+}
+.hero-cta:hover{background:var(--rust2);transform:translateY(-1px);box-shadow:0 6px 18px rgba(123,45,33,.4)}
+.hero-cta::after{content:'→';font-size:1.1rem}
+
+/* ── Metrics Grid ──────────────────────────────────────────────────────── */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin:1.5rem 0}
+.metric{
+  background:#fff;border:1px solid var(--line);
+  border-radius:var(--radius-lg);padding:1.25rem 1rem;
+  text-align:center;box-shadow:var(--shadow-sm);
+  transition:transform var(--transition),box-shadow var(--transition);
+}
+.metric:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.metric strong{display:block;font-size:2rem;font-weight:800;color:var(--rust);line-height:1}
+.metric span{font-size:.82rem;color:var(--muted);font-weight:500;margin-top:.3rem;display:block}
+
+/* ── Progress Bar ──────────────────────────────────────────────────────── */
+.progress-wrap{margin:1rem 0 .4rem}
+.progress-label{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-bottom:.4rem;font-weight:500}
+.progress{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--rust),var(--rust2));width:0;border-radius:999px;transition:width .6s ease}
+
+/* ── Dashboard ─────────────────────────────────────────────────────────── */
+#dashboard h1{font-size:1.6rem;font-weight:800;margin-bottom:1rem}
+.controls{
+  display:flex;gap:.75rem;flex-wrap:wrap;
+  margin:1rem 0 1.25rem;
+  background:#fff;padding:.75rem;border-radius:var(--radius);
+  border:1px solid var(--line);box-shadow:var(--shadow-sm);
+}
+input[type=search]{
+  flex:1;min-width:220px;
+  border:1.5px solid var(--line2);border-radius:var(--radius-sm);
+  padding:.6rem .9rem;font-size:.9rem;color:var(--ink);
+  transition:border-color var(--transition);
+}
+input[type=search]:focus{border-color:var(--rust)}
+select{
+  border:1.5px solid var(--line2);border-radius:var(--radius-sm);
+  padding:.6rem .9rem;font-size:.9rem;color:var(--ink);
+  background:#fff;min-width:160px;
+  transition:border-color var(--transition);
+}
+select:focus{border-color:var(--rust)}
+
+/* ── Lesson Cards ──────────────────────────────────────────────────────── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1rem}
+.card{
+  background:#fff;border:1.5px solid var(--line);
+  border-radius:var(--radius-lg);padding:1.1rem;
+  display:flex;flex-direction:column;gap:.5rem;
+  box-shadow:var(--shadow-sm);
+  transition:transform var(--transition),box-shadow var(--transition),border-color var(--transition);
+  cursor:pointer;
+}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--rust)}
+.card.done{border-left:4px solid var(--green-dark)}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem}
+.card-title{font-weight:700;font-size:.95rem;color:var(--ink);flex:1}
+.card-meta{font-size:.8rem;color:var(--muted);line-height:1.4}
+.card-footer{margin-top:auto;padding-top:.5rem;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.start-btn{
+  background:var(--rust);color:#fff;border:none;
+  border-radius:var(--radius-sm);padding:.4rem .85rem;
+  font-size:.82rem;font-weight:600;
+  transition:background var(--transition);
+}
+.start-btn:hover{background:var(--rust2)}
+
+/* ── Badges ────────────────────────────────────────────────────────────── */
+.badge{
+  display:inline-flex;align-items:center;
+  padding:.2rem .6rem;border-radius:999px;
+  font-size:.75rem;font-weight:600;
+  background:#f1f5f9;color:var(--muted);
+}
+.badge.obj{background:var(--rust-light);color:var(--rust)}
+.badge.type{background:#ede9fe;color:#5b21b6}
+.badge.done-badge{background:var(--green);color:var(--green-dark)}
+
+/* ── Lesson View ───────────────────────────────────────────────────────── */
+#lesson .back-row{
+  display:flex;align-items:center;gap:.75rem;
+  margin-bottom:1.25rem;flex-wrap:wrap;
+}
+.btn-back{
+  display:inline-flex;align-items:center;gap:.4rem;
+  border:1.5px solid var(--line2);background:#fff;
+  border-radius:var(--radius-sm);padding:.5rem 1rem;
+  font-size:.88rem;font-weight:600;color:var(--ink2);
+  transition:all var(--transition);
+}
+.btn-back:hover{border-color:var(--rust);color:var(--rust);background:var(--rust-xlight)}
+
+/* Lesson Header Card */
+.lesson-header-card{
+  background:linear-gradient(135deg,#fff 55%,var(--rust-xlight) 100%);
+  border:1px solid var(--line);border-left:5px solid var(--rust);
+  border-radius:var(--radius-lg);padding:1.5rem 1.75rem;
+  margin-bottom:1.25rem;box-shadow:var(--shadow-sm);
+}
+.lesson-header-card .lh-badges{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem}
+.lesson-header-card h2{font-size:1.4rem;font-weight:800;color:var(--ink);margin-bottom:.3rem}
+.lesson-header-card .lh-meta{font-size:.82rem;color:var(--muted);display:flex;gap:1rem;flex-wrap:wrap}
+
+/* Mode Tabs */
+.modebar{
+  display:flex;flex-wrap:wrap;gap:.5rem;
+  margin-bottom:1rem;
+  background:#fff;padding:.6rem;
+  border-radius:var(--radius);border:1px solid var(--line);
+  box-shadow:var(--shadow-sm);
+}
+.modebtn{
+  border:1.5px solid var(--line2);background:#fff;
+  border-radius:var(--radius-sm);padding:.5rem .9rem;
+  font-size:.83rem;font-weight:600;color:var(--muted);
+  transition:all var(--transition);
+}
+.modebtn:hover{border-color:var(--rust);color:var(--rust);background:var(--rust-xlight)}
+.modebtn.active{background:var(--rust);color:#fff;border-color:var(--rust);box-shadow:0 2px 6px rgba(123,45,33,.25)}
+
+/* Two-column lesson layout */
+.lesson-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 300px;
+  gap:1.25rem;
+  align-items:start;
+}
+.panel{
+  background:#fff;border:1px solid var(--line);
+  border-radius:var(--radius-lg);padding:1.5rem;
+  box-shadow:var(--shadow-sm);
+}
+
+/* ── Mode Content Styles ───────────────────────────────────────────────── */
+.mode-title{
+  font-size:1rem;font-weight:700;color:var(--rust);
+  margin-bottom:1rem;padding-bottom:.6rem;
+  border-bottom:2px solid var(--rust-light);
+  display:flex;align-items:center;gap:.5rem;
+}
+.mode-title::before{font-size:1.1rem}
+
+/* Step navigation */
+.step-indicator{
+  display:flex;align-items:center;gap:.4rem;
+  margin-bottom:1rem;flex-wrap:wrap;
+}
+.step-dot{
+  width:28px;height:28px;border-radius:50%;
+  border:2px solid var(--line2);background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:700;color:var(--muted);
+  transition:all var(--transition);flex-shrink:0;
+}
+.step-dot.active{background:var(--rust);border-color:var(--rust);color:#fff;box-shadow:0 2px 6px rgba(123,45,33,.3)}
+.step-dot.done{background:var(--green-dark);border-color:var(--green-dark);color:#fff}
+.step-line{flex:1;height:2px;background:var(--line);min-width:12px;max-width:32px}
+
+.stepnav{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:.75rem;margin-top:1.5rem;
+  padding-top:1rem;border-top:1px solid var(--line);
+}
+.btn-step{
+  display:inline-flex;align-items:center;gap:.4rem;
+  border:1.5px solid var(--line2);background:#fff;
+  border-radius:var(--radius-sm);padding:.55rem 1.1rem;
+  font-size:.88rem;font-weight:600;color:var(--ink2);
+  transition:all var(--transition);
+}
+.btn-step:hover{border-color:var(--rust);color:var(--rust);background:var(--rust-xlight)}
+.btn-step.primary{background:var(--rust);color:#fff;border-color:var(--rust)}
+.btn-step.primary:hover{background:var(--rust2)}
+.btn-step:disabled{opacity:.4;cursor:not-allowed}
+
+/* Callouts */
+.callout{
+  border-radius:var(--radius);padding:1rem 1.1rem;
+  margin:1rem 0;border-left:4px solid transparent;
+}
+.callout.blue{background:var(--blue);border-color:var(--blue-dark)}
+.callout.yellow{background:var(--yellow);border-color:var(--yellow-dark)}
+.callout.green{background:var(--green);border-color:var(--green-dark)}
+.callout.rust{background:var(--rust-light);border-color:var(--rust)}
+.callout-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem;opacity:.75}
+.callout p{margin:0;font-size:.92rem}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;font-size:.9rem;margin:.75rem 0}
+th{
+  background:var(--rust);color:#fff;
+  padding:.65rem .85rem;text-align:left;font-weight:600;font-size:.82rem;
+}
+th:first-child{border-radius:var(--radius-sm) 0 0 0}
+th:last-child{border-radius:0 var(--radius-sm) 0 0}
+td{padding:.65rem .85rem;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+
+/* Flow diagram */
+.flow{
+  display:flex;flex-wrap:wrap;gap:.5rem;
+  align-items:center;padding:.75rem 0;
+}
+.node{
+  border:1.5px solid var(--line2);background:#fff;
+  padding:.55rem .9rem;border-radius:var(--radius-sm);
+  font-size:.85rem;font-weight:600;color:var(--ink);
+  box-shadow:var(--shadow-sm);
+}
+.node.highlight{background:var(--rust-light);border-color:var(--rust);color:var(--rust)}
+.arrow{color:var(--rust);font-weight:800;font-size:1.1rem}
+
+/* Quiz choices */
+.choices-list{display:flex;flex-direction:column;gap:.6rem;margin:1rem 0}
+.choice{
+  display:flex;align-items:flex-start;gap:.75rem;
+  width:100%;text-align:left;
+  border:1.5px solid var(--line2);background:#fff;
+  border-radius:var(--radius);padding:.85rem 1rem;
+  font-size:.9rem;color:var(--ink2);font-weight:500;
+  transition:all var(--transition);
+}
+.choice:hover:not(:disabled){border-color:var(--rust);background:var(--rust-xlight);color:var(--ink)}
+.choice .choice-letter{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--line);color:var(--muted);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;flex-shrink:0;margin-top:.05rem;
+  transition:all var(--transition);
+}
+.choice:hover:not(:disabled) .choice-letter{background:var(--rust);color:#fff}
+.choice.correct{border-color:var(--green-dark);background:var(--green)}
+.choice.correct .choice-letter{background:var(--green-dark);color:#fff}
+.choice.wrong{border-color:#a12622;background:#fdeceb}
+.choice.wrong .choice-letter{background:#a12622;color:#fff}
+.choice:disabled{cursor:default}
+
+/* Explanation box */
+.explain-box{
+  border-radius:var(--radius);padding:1rem 1.1rem;
+  margin-top:.75rem;font-size:.88rem;
+  background:var(--blue);border-left:4px solid var(--blue-dark);
+}
+.explain-box strong{color:var(--blue-dark)}
+
+/* Sidebar */
+.sidebar{position:sticky;top:80px}
+.sidebar h3{
+  font-size:.82rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--muted);
+  margin-bottom:.6rem;padding-bottom:.4rem;
+  border-bottom:1px solid var(--line);
+}
+.sidebar h3:not(:first-child){margin-top:1.25rem}
+.linkbtn{
+  display:flex;align-items:center;gap:.4rem;
+  width:100%;text-align:left;border:0;background:none;
+  color:var(--blue-dark);padding:.3rem 0;font-size:.87rem;
+  font-weight:500;transition:color var(--transition);
+}
+.linkbtn:hover{color:var(--rust)}
+.linkbtn::before{content:'→';font-size:.8rem;opacity:.6}
+.complete-btn{
+  width:100%;margin-top:1rem;
+  border:1.5px solid var(--green-dark);
+  background:var(--green);color:var(--green-dark);
+  border-radius:var(--radius-sm);padding:.65rem;
+  font-size:.88rem;font-weight:700;
+  transition:all var(--transition);
+}
+.complete-btn:hover{background:var(--green-dark);color:#fff}
+.complete-btn.done{background:var(--green-dark);color:#fff}
+
+/* Self-check list */
+.self-check-list{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+.self-check-list li{
+  font-size:.83rem;color:var(--ink2);
+  padding:.4rem .6rem;background:#fafafa;
+  border-radius:var(--radius-sm);border:1px solid var(--line);
+  line-height:1.4;
+}
+.self-check-list li::before{content:'💭 ';font-size:.8rem}
+
+/* Source alignment */
+.source-row{font-size:.82rem;color:var(--muted);margin:.2rem 0}
+.source-row strong{color:var(--ink2)}
+
+/* ── Map & Coverage ────────────────────────────────────────────────────── */
+#map h1,#coverage h1,#progress h1{font-size:1.6rem;font-weight:800;margin-bottom:1rem}
+.coverage table{font-size:.88rem}
+.coverage th{background:var(--rust)}
+
+/* ── Progress Screen ───────────────────────────────────────────────────── */
+.btn-danger{
+  border:1.5px solid #a12622;background:#fdeceb;color:#a12622;
+  border-radius:var(--radius-sm);padding:.6rem 1.2rem;
+  font-size:.88rem;font-weight:600;margin-top:1rem;
+  transition:all var(--transition);
+}
+.btn-danger:hover{background:#a12622;color:#fff}
+
+/* ── Utility ───────────────────────────────────────────────────────────── */
+.small{font-size:.82rem;color:var(--muted)}
+.completeMark{color:var(--green-dark);font-weight:700}
+.section-label{
+  font-size:.72rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.07em;color:var(--muted);margin-bottom:.5rem;display:block;
+}
+.divider{height:1px;background:var(--line);margin:1rem 0}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media(max-width:900px){
+  .lesson-layout{grid-template-columns:1fr}
+  .sidebar{position:static}
+  .topbar{position:static}
+}
+@media(max-width:600px){
+  main{padding:1rem .75rem}
+  .hero{padding:1.5rem 1.1rem}
+  .panel{padding:1rem}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PROFESSIONAL UI OVERRIDE — Executive Cyber Learning Platform
+   Visual layer only; lesson data and application logic remain unchanged.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root{
+  --navy:#0b1728;--navy-2:#10233d;--navy-3:#173451;
+  --accent:#9b3a2b;--accent-2:#c35c45;--accent-soft:#f7ebe7;
+  --gold:#b88a44;--surface:#ffffff;--surface-2:#f7f9fc;
+  --ink:#172033;--ink2:#3c485b;--muted:#6d7888;--muted2:#9aa4b2;
+  --bg:#eef2f6;--line:#dfe5ec;--line2:#cbd4df;
+  --shadow-sm:0 1px 2px rgba(16,24,40,.05);
+  --shadow:0 8px 24px rgba(16,24,40,.08);
+  --shadow-lg:0 18px 48px rgba(16,24,40,.12);
+}
+html{background:var(--navy)}
+body{font-family:Inter,"Segoe UI",Roboto,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);letter-spacing:-.005em}
+body::before{content:"";position:fixed;inset:0 0 0 248px;pointer-events:none;background:radial-gradient(circle at 85% 5%,rgba(155,58,43,.06),transparent 25%),linear-gradient(180deg,#f8fafc 0,#eef2f6 48%,#edf1f5 100%);z-index:-1}
+h1,h2,h3,h4{letter-spacing:-.025em}
+p{color:var(--ink2)}
+
+/* Left application rail */
+.topbar{position:fixed;left:0;top:0;bottom:0;width:248px;height:100vh;z-index:200;display:flex;flex-direction:column;align-items:stretch;gap:.35rem;flex-wrap:nowrap;padding:1.25rem .9rem;background:linear-gradient(180deg,var(--navy) 0%,#0d1d31 58%,#10253c 100%);border:0;border-right:1px solid rgba(255,255,255,.07);box-shadow:10px 0 30px rgba(15,23,42,.08);backdrop-filter:none}
+.brand{margin:0 0 1.35rem 0;color:#fff;font-size:1rem;letter-spacing:-.01em;padding:.45rem .5rem 1rem;border-bottom:1px solid rgba(255,255,255,.10);display:grid;grid-template-columns:44px 1fr;grid-template-rows:auto auto;column-gap:.7rem;align-items:center}
+.brand::before{content:'S+';grid-row:1/3;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,var(--accent-2),var(--accent));color:#fff;font-size:.95rem;font-weight:900;box-shadow:0 8px 20px rgba(155,58,43,.35)}
+.brand::after{content:'SY0-701 · DOMAIN 3';font-size:.63rem;font-weight:700;color:#94a3b8;letter-spacing:.09em;margin-top:.08rem}
+.navbtn{position:relative;width:100%;text-align:left;border:1px solid transparent;background:transparent;color:#aeb9c8;border-radius:10px;padding:.74rem .82rem;font-size:.86rem;font-weight:650;letter-spacing:.01em;transition:all .16s ease}
+.navbtn:hover{border-color:rgba(255,255,255,.08);background:rgba(255,255,255,.055);color:#fff}
+.navbtn.active{background:linear-gradient(90deg,rgba(155,58,43,.28),rgba(155,58,43,.12));border-color:rgba(195,92,69,.30);color:#fff;box-shadow:none}
+.navbtn.active::before{content:"";position:absolute;left:-.9rem;top:18%;bottom:18%;width:3px;border-radius:0 3px 3px 0;background:#d46852}
+
+/* Page frame */
+main{max-width:none;margin:0 0 0 248px;padding:2.25rem clamp(1.25rem,3vw,3.5rem) 4rem;min-height:100vh}
+.screen{max-width:1480px;margin:0 auto}
+
+/* Hero */
+.hero{position:relative;overflow:hidden;background:linear-gradient(118deg,#13233a 0%,#182e49 56%,#4c2c2a 100%);border:1px solid rgba(255,255,255,.06);border-left:0;padding:clamp(2.25rem,5vw,4.4rem);border-radius:22px;margin-top:.35rem;box-shadow:var(--shadow-lg)}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(90deg,transparent 10%,#000 100%);pointer-events:none}
+.hero::after{content:"";position:absolute;width:430px;height:430px;border-radius:50%;right:-150px;top:-190px;border:80px solid rgba(195,92,69,.12);box-shadow:0 0 0 55px rgba(184,138,68,.045);pointer-events:none}
+.hero-badges,.hero h1,.hero h2,.hero p,.hero-cta{position:relative;z-index:1}
+.hero-badges{margin-bottom:1.35rem}
+.hero .badge{border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#dce5ef;backdrop-filter:blur(8px)}
+.hero .badge.obj{background:rgba(195,92,69,.18);color:#ffd9d0;border-color:rgba(195,92,69,.3)}
+.hero .badge.type{background:rgba(184,138,68,.15);color:#f3ddb9;border-color:rgba(184,138,68,.28)}
+.hero h1{font-size:clamp(2.15rem,4.1vw,4rem);line-height:1.02;color:#fff;max-width:900px;margin-bottom:.75rem}
+.hero h2{font-size:clamp(1.08rem,1.7vw,1.4rem);color:#e9c1b9;font-weight:600;margin-bottom:1rem}
+.hero p{color:#d3dce7;max-width:760px;font-size:1.02rem;line-height:1.72}
+.hero .sub{color:#9eacbd;margin-top:.45rem}
+.hero-cta{margin-top:1.75rem;border-radius:10px;padding:.82rem 1.35rem;background:linear-gradient(135deg,#c35c45,#963728);box-shadow:0 10px 28px rgba(0,0,0,.24);letter-spacing:.005em}
+.hero-cta:hover{transform:translateY(-2px);background:linear-gradient(135deg,#ce684f,#a13c2c);box-shadow:0 13px 30px rgba(0,0,0,.28)}
+
+/* Metrics */
+.metrics{gap:.9rem;margin:1.2rem 0 1.8rem}
+.metric{text-align:left;position:relative;overflow:hidden;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:14px;padding:1rem 1.05rem;box-shadow:var(--shadow-sm)}
+.metric::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent);opacity:.55}
+.metric:hover{transform:none;box-shadow:var(--shadow)}
+.metric strong{font-size:1.65rem;color:var(--ink);letter-spacing:-.04em}
+.metric span{color:var(--muted);font-size:.76rem;text-transform:uppercase;letter-spacing:.055em;font-weight:700}
+
+/* Section titles and controls */
+#dashboard::before,#map::before,#coverage::before,#progress::before{display:block;margin-bottom:.45rem;font-size:.7rem;font-weight:800;letter-spacing:.11em;color:var(--accent);text-transform:uppercase}
+#dashboard::before{content:'Learning Library'}#map::before{content:'Knowledge Architecture'}#coverage::before{content:'Curriculum Alignment'}#progress::before{content:'Learner Analytics'}
+#dashboard h1,#map h1,#coverage h1,#progress h1{font-size:clamp(1.7rem,2.4vw,2.25rem);margin-bottom:.9rem}
+.controls{gap:.65rem;margin:1rem 0 1.35rem;padding:.6rem;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-sm)}
+input[type=search],select{border:1px solid var(--line);border-radius:9px;padding:.7rem .82rem;background:#f9fbfd;color:var(--ink)}
+input[type=search]:focus,select:focus{border-color:#9bb0c7;box-shadow:0 0 0 3px rgba(71,107,145,.09)}
+
+/* Progress */
+.progress{height:8px;background:#e6ebf1}.progress>div{background:linear-gradient(90deg,var(--accent),#d1725d)}
+.progress-label{font-size:.78rem;font-weight:700;color:var(--muted)}
+
+/* Lesson cards */
+.grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.9rem}
+.card{position:relative;min-height:220px;border:1px solid var(--line);border-radius:14px;padding:1rem 1rem .95rem;background:linear-gradient(180deg,#fff 0%,#fbfcfd 100%);box-shadow:var(--shadow-sm);cursor:default;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.card::before{content:"";position:absolute;top:-1px;left:14px;right:14px;height:3px;border-radius:0 0 3px 3px;background:linear-gradient(90deg,var(--accent),#d17a67);opacity:.85}
+.card:hover{transform:translateY(-3px);border-color:#ccd5df;box-shadow:0 14px 30px rgba(16,24,40,.10)}
+.card.done{border-left:1px solid var(--line);box-shadow:inset 4px 0 0 #2f855a,var(--shadow-sm)}
+.card-title{font-size:1.01rem;line-height:1.35;color:var(--ink)}
+.card-meta{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+.card p{font-size:.86rem!important;color:#4d596a!important;line-height:1.55!important}
+.card-footer{padding-top:.75rem;border-top:1px solid #edf0f3}
+.start-btn{border-radius:8px;padding:.48rem .72rem;background:#172d48;color:#fff;font-size:.78rem}
+.start-btn:hover{background:#213d60}
+.badge{font-size:.69rem;font-weight:750;padding:.22rem .52rem;letter-spacing:.025em}
+.badge.obj{background:#f8e9e5;color:#8f3125}.badge.type{background:#eaf0f8;color:#385b83}.badge.done-badge{background:#e7f5ed;color:#1c6842}
+
+/* Lesson workspace */
+#lesson .back-row{margin-bottom:.9rem}.btn-back{border:0;background:transparent;padding:.35rem 0;border-radius:0;color:#5d6878}.btn-back:hover{background:transparent;color:var(--accent)}
+.lesson-header-card{position:relative;overflow:hidden;background:linear-gradient(115deg,#122239 0%,#17304e 72%,#532f2b 100%);border:0;border-left:0;border-radius:16px;padding:1.55rem 1.65rem;box-shadow:var(--shadow);margin-bottom:.85rem}
+.lesson-header-card::after{content:"";position:absolute;right:-70px;top:-110px;width:230px;height:230px;border-radius:50%;border:50px solid rgba(255,255,255,.035)}
+.lesson-header-card h2{color:#fff;font-size:clamp(1.45rem,2.3vw,2rem);position:relative;z-index:1}.lesson-header-card .lh-badges,.lesson-header-card .lh-meta{position:relative;z-index:1}.lesson-header-card .lh-meta{color:#c7d1dc}.lesson-header-card .lh-meta span{color:#c7d1dc}
+.lesson-header-card .badge{border:1px solid rgba(255,255,255,.11)}.lesson-header-card .badge.obj{background:rgba(195,92,69,.18);color:#ffd5cb}.lesson-header-card .badge.type{background:rgba(255,255,255,.08);color:#dce5ef}.lesson-header-card .badge.done-badge{background:rgba(47,133,90,.22);color:#c7f0d8}
+.modebar{gap:.35rem;margin-bottom:.85rem;padding:.35rem;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-sm)}
+.modebtn{border:0;background:transparent;border-radius:8px;padding:.58rem .8rem;color:#647083;font-size:.78rem}.modebtn:hover{border:0;background:#f1f4f7;color:var(--ink)}.modebtn.active{background:#172d48;color:#fff;border:0;box-shadow:none}
+.lesson-layout{grid-template-columns:minmax(0,1fr) 315px;gap:1rem}.panel{border:1px solid var(--line);border-radius:14px;padding:1.35rem;box-shadow:var(--shadow-sm)}
+.mode-title{font-size:.93rem;color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:.72rem;margin-bottom:1.1rem;letter-spacing:.015em}
+.sidebar{top:1.25rem}.sidebar h3{font-size:.68rem;letter-spacing:.1em;color:#788496}.self-check-list li{background:#f8fafc;border:1px solid #e7ebf0}.self-check-list li::before{content:'• ';color:var(--accent);font-weight:900}
+.linkbtn{color:#355e8d}.linkbtn:hover{color:var(--accent)}
+.complete-btn{border:0;background:#e8f5ee;color:#19643d}.complete-btn:hover,.complete-btn.done{background:#216d48;color:#fff}
+
+/* Learning content */
+.callout{border-radius:10px;border-left-width:3px}.callout.blue{background:#eef5fb}.callout.yellow{background:#fff7df}.callout.green{background:#edf8f1}.callout.rust{background:#fbefec}
+.node{border:1px solid var(--line);border-radius:9px;box-shadow:none}.node.highlight{background:#f8e9e5;border-color:#d7aaa1;color:#8e3025}
+.step-dot{width:26px;height:26px}.step-dot.active{background:#17304e;border-color:#17304e;box-shadow:none}.step-dot.done{background:#2f7f56;border-color:#2f7f56}.btn-step{border:1px solid var(--line);border-radius:8px}.btn-step.primary{background:#17304e;border-color:#17304e}.btn-step.primary:hover{background:#213e60}
+.choices-list{gap:.5rem}.choice{border:1px solid var(--line);border-radius:10px;padding:.8rem .9rem;background:#fff}.choice:hover:not(:disabled){border-color:#b8c4d2;background:#f8fafc}.choice .choice-letter{background:#edf1f5}.choice:hover:not(:disabled) .choice-letter{background:#17304e}.explain-box{background:#eef5fb;border-left-color:#4c759f}
+
+/* Tables */
+table{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm)}
+th{background:#172d48;color:#f8fafc;font-size:.72rem;text-transform:uppercase;letter-spacing:.045em}td{color:#465366}tr:hover td{background:#fafbfc}
+
+/* Mobile */
+@media(max-width:900px){
+  html{background:var(--bg)}body::before{display:none}
+  .topbar{position:sticky;left:auto;right:auto;bottom:auto;width:auto;height:auto;min-height:0;display:flex;flex-direction:row;align-items:center;gap:.4rem;padding:.55rem .75rem;background:#0d1d31;overflow-x:auto;border-right:0;border-bottom:1px solid rgba(255,255,255,.08)}
+  .brand{display:flex;min-width:max-content;margin:0 auto 0 0;padding:.2rem .65rem .2rem 0;border:0}.brand::before{width:34px;height:34px;border-radius:9px;font-size:.75rem}.brand::after{display:none}
+  .navbtn{width:auto;min-width:max-content;padding:.55rem .7rem}.navbtn.active::before{display:none}
+  main{margin:0;padding:1.2rem .9rem 3rem}.lesson-layout{grid-template-columns:1fr}.sidebar{position:static}
+}
+@media(max-width:600px){.hero{padding:1.65rem 1.15rem;border-radius:15px}.grid{grid-template-columns:1fr}.panel{padding:1rem}.metrics{grid-template-columns:repeat(2,1fr)}}
+
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">Security+ Domain 3</div>
+  <button class="navbtn active" data-screen="start">Start</button>
+  <button class="navbtn" data-screen="dashboard">Lessons</button>
+  <button class="navbtn" data-screen="map">Connections</button>
+  <button class="navbtn" data-screen="coverage">Source Coverage</button>
+  <button class="navbtn" data-screen="progress">Progress</button>
+</header>
+
+<main>
+<!-- ── START ── -->
+<section id="start" class="screen active">
+  <div class="hero">
+    <div class="hero-badges">
+      <span class="badge obj">CompTIA Security+ SY0-701</span>
+      <span class="badge">Domain 3.0</span>
+      <span class="badge type">Security Architecture</span>
+    </div>
+    <h1>Security+ Interactive Learning System</h1>
+    <h2>Domain 3 — Learner-Led Edition</h2>
+    <p>Learn the system, not just the definition. Explore architecture, follow data and traffic, investigate failures, and practice CompTIA best-answer reasoning.</p>
+    <p class="sub">Self-contained · Offline-ready · Based on Professor Messer's Domain 3 course-note sections</p>
+    <button class="hero-cta" id="enterBtn">Enter the Learning System</button>
+  </div>
+  <div class="metrics">
+    <div class="metric"><strong>101</strong><span>Learner-led lessons</span></div>
+    <div class="metric"><strong>4</strong><span>Objectives covered</span></div>
+    <div class="metric"><strong>5</strong><span>Learning modes per lesson</span></div>
+    <div class="metric"><strong>0</strong><span>External dependencies</span></div>
+  </div>
+</section>
+
+<!-- ── DASHBOARD ── -->
+<section id="dashboard" class="screen">
+  <h1>Lesson Dashboard</h1>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Overall Progress</span><span id="dashProgressPct">0%</span></div>
+    <div class="progress"><div id="dashBar"></div></div>
+  </div>
+  <p id="dashProgress" class="small" style="margin-top:.4rem"></p>
+  <div class="controls">
+    <input id="search" type="search" placeholder="🔍  Search lessons…" aria-label="Search lessons">
+    <select id="filter" aria-label="Filter lessons">
+      <option value="all">All lessons</option>
+      <option value="complete">✅ Completed</option>
+      <option value="incomplete">⬜ Incomplete</option>
+    </select>
+  </div>
+  <div id="lessonGrid" class="grid"></div>
+</section>
+
+<!-- ── LESSON ── -->
+<section id="lesson" class="screen">
+  <div class="back-row">
+    <button class="btn-back" id="backBtn">← Back to Lessons</button>
+    <div id="lessonBreadcrumb" class="small"></div>
+  </div>
+  <div id="lessonHead"></div>
+  <div class="modebar" id="modebar"></div>
+  <div class="lesson-layout">
+    <div class="panel" id="lessonContent"></div>
+    <aside class="panel sidebar" id="sidebar"></aside>
+  </div>
+</section>
+
+<!-- ── MAP ── -->
+<section id="map" class="screen">
+  <h1>Concept Connection Map</h1>
+  <p class="small" style="margin-bottom:1rem">Select any concept to open its learner-led lesson.</p>
+  <div id="mapGrid" class="grid"></div>
+</section>
+
+<!-- ── COVERAGE ── -->
+<section id="coverage" class="screen">
+  <h1>Source Coverage</h1>
+  <div class="metrics">
+    <div class="metric"><strong>101</strong><span>Concept lessons</span></div>
+    <div class="metric"><strong>4</strong><span>Objectives</span></div>
+    <div class="metric"><strong>17</strong><span>Course-note pages</span></div>
+    <div class="metric"><strong>0</strong><span>Unmapped records</span></div>
+  </div>
+  <div id="coverageTables"></div>
+</section>
+
+<!-- ── PROGRESS ── -->
+<section id="progress" class="screen">
+  <h1>Progress</h1>
+  <div id="progressMetrics" class="metrics"></div>
+  <div class="panel" style="margin-top:1rem">
+    <h2 style="font-size:1.1rem;margin-bottom:.75rem">Overall Completion</h2>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Lessons completed</span><span id="progressPct">0%</span></div>
+      <div class="progress"><div id="progressBar"></div></div>
+    </div>
+    <p id="progressText" class="small" style="margin-top:.5rem"></p>
+    <button class="btn-danger" id="resetBtn">🔄 Reset All Progress</button>
+  </div>
+</section>
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   LESSON DATA
+═══════════════════════════════════════════════════════════════════════ */
+const lessons=[{"id": "api", "obj": "3.1", "cat": "Application Architecture", "title": "Application Programming Interface", "pages": "43 (PDF 52)", "heading": "Cloud Infrastructures (continued)", "type": "Architecture", "problem": "How do applications or services request functions and exchange data in a controlled way?", "plain": "An Application Programming Interface (API) defines how software components send requests and receive responses.", "analogy": "This concept is treated as its own lesson because CompTIA can test application programming interface independently.", "structure": [["Client", "Sends a request"], ["API endpoint", "Receives the request"], ["Authorization", "Determines permitted action"], ["Response", "Returns data or status"]], "flow": ["Client creates request", "API authenticates and authorizes", "Service processes request", "Response is returned", "Activity is logged"], "why": ["Application Programming Interface solves a distinct security or architectural problem.", "Its purpose and behavior are different from related concepts.", "Its placement or use determines the security outcome.", "Misconfiguration creates its own evidence and failure pattern.", "CompTIA may present it as the best answer based on a decisive scenario clue."], "issue": "An API accepts a sensitive request without checking authorization.", "evidence": "API gateway logs, token claims, application logs, policy configuration.", "fix": "Enforce authorization at the API boundary and retest.", "q": "What is the PRIMARY purpose of an API?", "choices": ["Distribute electrical power", "Define communication between software components", "Create a physical air gap", "Replace all databases"], "answer": 1, "explain": ["Power distribution is unrelated.", "Correct. APIs define software communication.", "APIs are logical interfaces.", "APIs do not replace all databases."], "connections": ["microservices", "serverless"]}, {"id": "microservices", "obj": "3.1", "cat": "Application Architecture", "title": "Microservices Architecture", "pages": "43 (PDF 52)", "heading": "Cloud Infrastructures (continued)", "type": "Architecture", "problem": "How can a large application be divided into independently deployable services?", "plain": "Microservices architecture separates an application into small services that perform distinct business functions.", "analogy": "This concept is treated as its own lesson because CompTIA can test microservices architecture independently.", "structure": [["Service boundary", "Defines one function"], ["Independent deployment", "Allows separate updates"], ["Service data", "May be isolated per service"], ["Failure isolation", "Limits some failures to one service"]], "flow": ["Divide the application", "Deploy each service", "Authorize service access", "Monitor service health", "Scale services independently"], "why": ["Microservices Architecture solves a distinct security or architectural problem.", "Its purpose and behavior are different from related concepts.", "Its placement or use determines the security outcome.", "Misconfiguration creates its own evidence and failure pattern.", "CompTIA may present it as the best answer based on a decisive scenario clue."], "issue": "One failed service causes cascading failures because dependencies were not controlled.", "evidence": "Service health, dependency map, distributed traces, error logs.", "fix": "Isolate the dependency, add resilience, and validate service boundaries.", "q": "Which characteristic BEST describes microservices?", "choices": ["A single monolithic deployment", "Small independently deployable services", "A physical air gap", "A backup media type"], "answer": 1, "explain": ["That describes a monolith.", "Correct. Microservices are independently deployable units.", "An air gap is physical isolation.", "Backup media is unrelated."], "connections": ["api", "serverless"]}, {"id": "hybrid-cloud", "obj": "3.1", "cat": "Cloud Architecture", "title": "Hybrid Cloud Security", "pages": "42 (PDF 51)", "heading": "Cloud Infrastructures", "type": "Architecture", "problem": "How can an organization apply consistent security when applications and data span several public and private environments?", "plain": "A hybrid cloud combines more than one public or private cloud environment. Security becomes harder because identity, firewalls, server settings, monitoring, and data handling may differ across platforms.", "analogy": "It is like operating several buildings with different locks, alarm systems, and visitor rules while expecting one security team to protect them all.", "structure": [["Identity", "Authentication must work consistently across platforms"], ["Network protection", "Firewall and segmentation rules may not match"], ["Monitoring", "Logs use different formats and services"], ["Data", "Information may cross the public Internet or multiple trust boundaries"]], "flow": ["Inventory every environment", "Map trust boundaries and data paths", "Normalize identity and access", "Align network controls", "Centralize or correlate monitoring"], "why": ["Multiple platforms create more policy boundaries.", "Different services expose different configuration models.", "Inconsistent identity creates access gaps.", "Diverse logs make incidents harder to correlate.", "CompTIA emphasizes complexity and data leakage risk."], "issue": "A security team monitors the private cloud but does not ingest logs from a public-cloud workload.", "evidence": "Missing cloud audit logs, inconsistent timestamps, incomplete incident timeline.", "fix": "Enable cloud-specific logging and correlate it with centralized monitoring.", "q": "Which challenge is MOST characteristic of a hybrid-cloud security design?", "choices": ["All systems use identical controls", "Security monitoring and configurations differ across platforms", "The customer has no security responsibilities", "Data never crosses a public network"], "answer": 1, "explain": ["Hybrid environments rarely have identical controls.", "Correct. Different platforms often use different logging, authentication, and firewall configurations.", "Shared responsibility still applies.", "Hybrid designs may transmit data across public or provider networks."], "connections": ["third-party-cloud"]}, {"id": "iac", "obj": "3.1", "cat": "Cloud Architecture", "title": "Infrastructure as Code", "pages": "43 (PDF 52)", "heading": "Cloud Infrastructures (continued)", "type": "Configuration", "problem": "How can teams build the same secure infrastructure repeatedly without manually configuring every server and network?", "plain": "Infrastructure as code describes servers, networks, and applications in version-controlled code so environments can be created consistently.", "analogy": "It is a tested construction blueprint that can be reused instead of rebuilding from memory each time.", "structure": [["Definition file", "Describes the desired infrastructure"], ["Version control", "Tracks changes and supports rollback"], ["Automation engine", "Builds the defined resources"], ["Validation", "Checks that the deployed environment matches the approved design"]], "flow": ["Write the definition", "Review and version it", "Deploy from code", "Validate the result", "Update through controlled changes"], "why": ["Manual builds are inconsistent.", "Code can be reviewed and versioned.", "Repeatable builds reduce configuration drift.", "Rollback is easier when definitions are tracked.", "CompTIA links IaC with consistency and cloud automation."], "issue": "An administrator manually changes a production firewall, but the approved IaC template still contains the old rule.", "evidence": "Configuration drift, repository history, deployment logs, difference between desired and actual state.", "fix": "Reconcile the approved code and redeploy through change control.", "q": "What is the PRIMARY security benefit of infrastructure as code?", "choices": ["It removes the need for access control", "It creates repeatable, version-controlled configurations", "It guarantees that vulnerabilities cannot exist", "It eliminates cloud-provider responsibility"], "answer": 1, "explain": ["Access control remains necessary.", "Correct. Repeatability and version history reduce drift and support review.", "IaC can still contain insecure definitions.", "Provider responsibilities still exist."], "connections": ["serverless", "microservices"]}, {"id": "iaas", "obj": "3.1", "cat": "Cloud Architecture", "title": "Infrastructure as a Service", "pages": "42–43 (PDF 51–52)", "heading": "Cloud Infrastructures", "type": "Comparison", "problem": "Which layers must a customer secure when renting virtual infrastructure?", "plain": "Infrastructure as a Service (IaaS) provides virtualized compute, storage, and networking while the customer manages operating systems, applications, identities, and data.", "analogy": "This concept is treated as its own lesson because CompTIA can test infrastructure as a service independently.", "structure": [["Provider", "Facilities, hardware, and virtualization"], ["Customer", "Guest OS, applications, data, identities, and configuration"]], "flow": ["Provision virtual infrastructure", "Harden the guest OS", "Configure network controls", "Deploy applications", "Monitor customer-managed layers"], "why": ["Infrastructure as a Service solves a distinct security or architectural problem.", "Its purpose and behavior are different from related concepts.", "Its placement or use determines the security outcome.", "Misconfiguration creates its own evidence and failure pattern.", "CompTIA may present it as the best answer based on a decisive scenario clue."], "issue": "An IaaS virtual machine is exposed through an overly permissive remote-access rule.", "evidence": "Cloud firewall rules, VM logs, identity records, configuration history.", "fix": "Restrict the rule, harden the VM, and review customer-managed controls.", "q": "In an IaaS model, who normally patches the guest operating system?", "choices": ["The customer", "The physical ISP", "The hardware manufacturer", "The building owner"], "answer": 0, "explain": ["Correct. The customer manages the guest OS.", "The ISP only transports traffic.", "The hardware manufacturer does not administer the VM.", "The building owner is irrelevant."], "connections": ["shared-responsibility", "paas", "saas"]}, {"id": "paas", "obj": "3.1", "cat": "Cloud Architecture", "title": "Platform as a Service", "pages": "42–43 (PDF 51–52)", "heading": "Cloud Infrastructures", "type": "Comparison", "problem": "Which security duties remain when the provider manages the operating platform?", "plain": "Platform as a Service (PaaS) provides a managed runtime and operating platform while the customer secures applications, data, identities, and configuration.", "analogy": "This concept is treated as its own lesson because CompTIA can test platform as a service independently.", "structure": [["Provider", "Infrastructure, operating system, and runtime"], ["Customer", "Application code, data, identities, and permissions"]], "flow": ["Select the platform", "Deploy application code", "Configure identity and permissions", "Protect data", "Monitor the application"], "why": ["Platform as a Service solves a distinct security or architectural problem.", "Its purpose and behavior are different from related concepts.", "Its placement or use determines the security outcome.", "Misconfiguration creates its own evidence and failure pattern.", "CompTIA may present it as the best answer based on a decisive scenario clue."], "issue": "An application deployed to PaaS uses an insecure authorization rule.", "evidence": "Application logs, identity policy, platform configuration, code review.", "fix": "Correct the authorization logic and validate least privilege.", "q": "Which item is MOST likely the customer's responsibility in PaaS?", "choices": ["Physical server replacement", "Application code", "Hypervisor patching", "Facility access control"], "answer": 1, "explain": ["The provider manages physical servers.", "Correct. The customer develops and secures the application.", "The provider manages the hypervisor.", "The provider protects the facility."], "connections": ["shared-responsibility", "iaas", "saas"]}, {"id": "serverless", "obj": "3.1", "cat": "Cloud Architecture", "title": "Serverless Architecture", "pages": "43 (PDF 52)", "heading": "Cloud Infrastructures (continued)", "type": "Architecture", "problem": "How can developers run server-side logic without managing the underlying operating system?", "plain": "Serverless architecture, often called Function as a Service (FaaS), runs small event-triggered functions in provider-managed, stateless compute containers.", "analogy": "A commercial kitchen is used only when an order arrives; the building and equipment are managed by someone else.", "structure": [["Event", "Triggers a function"], ["Function", "Contains the developer's server-side logic"], ["Stateless container", "Runs temporarily for the event"], ["Provider platform", "Manages the operating system and execution environment"]], "flow": ["An event occurs", "The platform invokes the function", "The function processes input", "A result is returned", "The temporary execution ends"], "why": ["Developers focus on logic instead of servers.", "The provider manages OS security.", "Ephemeral execution can improve efficiency.", "Application and identity security still remain.", "CompTIA distinguishes provider-managed OS from customer-managed code."], "issue": "A function has excessive permissions and can read every storage bucket.", "evidence": "Function role, cloud audit logs, access-policy configuration, invocation records.", "fix": "Apply least privilege to the function identity and review its permissions.", "q": "In a serverless model, which item is MOST likely still the customer's responsibility?", "choices": ["Physical data-center security", "Hypervisor maintenance", "Function code and permissions", "Replacing failed physical disks"], "answer": 2, "explain": ["The provider protects the facility.", "The provider manages the execution platform.", "Correct. The customer develops the function and configures its access.", "The provider manages physical hardware."], "connections": ["microservices", "iac"]}, {"id": "shared-responsibility", "obj": "3.1", "cat": "Cloud Architecture", "title": "Shared Responsibility Model", "pages": "42–43 (PDF 51–52)", "heading": "Cloud Infrastructures", "type": "Comparison", "problem": "How are cloud security duties divided between the customer and the provider?", "plain": "The shared responsibility model defines which party secures each layer of a cloud service.", "analogy": "This concept is treated as its own lesson because CompTIA can test shared responsibility model independently.", "structure": [["Customer", "Protects customer-controlled identities, data, configurations, and workloads"], ["Provider", "Protects provider-controlled facilities, hardware, and managed service layers"]], "flow": ["Identify the cloud service", "Map each technology layer", "Assign ownership", "Document controls", "Verify evidence"], "why": ["Shared Responsibility Model solves a distinct security or architectural problem.", "Its purpose and behavior are different from related concepts.", "Its placement or use determines the security outcome.", "Misconfiguration creates its own evidence and failure pattern.", "CompTIA may present it as the best answer based on a decisive scenario clue."], "issue": "A customer assumes the provider manages employee access, leaving a former employee active.", "evidence": "Identity logs, contract, responsibility matrix, access configuration.", "fix": "Disable the account and document customer-owned access responsibilities.", "q": "Which item normally remains a customer responsibility in every cloud service model?", "choices": ["Physical data-center security", "Customer identities and access", "Hypervisor replacement", "Power generation"], "answer": 1, "explain": ["The provider manages physical facilities.", "Correct. The customer controls organizational identities and access decisions.", "The provider manages the hypervisor in managed cloud services.", "The provider manages facility power."], "connections": ["iaas", "paas", "saas"]}, {"id": "saas", "obj": "3.1", "cat": "Cloud Architecture", "title": "Software as a Service", "pages": "42–43 (PDF 51–52)", "heading": "Cloud Infrastructures", "type": "Comparison", "problem": "What security responsibilities remain when a complete application is delivered by a provider?", "plain": "Software as a Service (SaaS) delivers a provider-managed application, but the customer still controls organizational data, accounts, permissions, and configuration.", "analogy": "This concept is treated as its own lesson because CompTIA can test software as a service independently.", "structure": [["Provider", "Application platform and underlying infrastructure"], ["Customer", "Users, access, data, and tenant configuration"]], "flow": ["Create tenant accounts", "Configure permissions", "Upload or create data", "Monitor access", "Remove access when no longer needed"], "why": ["Software as a Service solves a distinct security or architectural problem.", "Its purpose and behavior are different from related concepts.", "Its placement or use determines the security outcome.", "Misconfiguration creates its own evidence and failure pattern.", "CompTIA may present it as the best answer based on a decisive scenario clue."], "issue": "A terminated employee retains access to the SaaS tenant.", "evidence": "Account status, login history, tenant permissions, offboarding records.", "fix": "Disable the account and correct the offboarding process.", "q": "Who is primarily responsible for removing a terminated employee from a SaaS tenant?", "choices": ["The customer", "The cloud hardware vendor", "The ISP", "The certificate manufacturer"], "answer": 0, "explain": ["Correct. The customer manages its own users.", "The hardware vendor does not manage tenant users.", "The ISP transports traffic.", "Certificates do not manage employment status."], "connections": ["shared-responsibility", "iaas", "paas"]}, {"id": "third-party-cloud", "obj": "3.1", "cat": "Cloud Architecture", "title": "Third-Party Cloud Vendors", "pages": "43 (PDF 52)", "heading": "Cloud Infrastructures (continued)", "type": "Operational practice", "problem": "How does an organization control risk when cloud services depend on additional vendors and cloud-based appliances?", "plain": "Cloud security may involve the customer, the primary cloud provider, and additional third parties. Vendor risk must be assessed continuously and included in incident-response planning.", "analogy": "A delivery company may subcontract part of a route. The customer still needs to know who handled the package and what happens if one party fails.", "structure": [["Customer", "Owns business risk and validates requirements"], ["Cloud provider", "Operates contracted cloud services"], ["Third party", "Supplies appliances, software, or infrastructure services"], ["Incident team", "Coordinates all parties during an event"]], "flow": ["Identify vendors", "Assess vendor risk", "Define responsibilities", "Monitor changes", "Include vendors in incident response"], "why": ["Each vendor adds dependencies and attack surface.", "Contracts alone do not detect changes.", "An incident may cross organizational boundaries.", "Continuous monitoring reveals unusual activity.", "CompTIA asks about third-party impact and ongoing assessment."], "issue": "A cloud security appliance vendor changes its service without notifying the customer, causing a logging gap.", "evidence": "Vendor notices, missing telemetry, configuration history, contract and SLA records.", "fix": "Restore logging, assess impact, and strengthen vendor monitoring and notification requirements.", "q": "What should an organization do FIRST to prepare for incidents involving cloud-based third-party vendors?", "choices": ["Exclude vendors from the response plan", "Document responsibilities and include vendors in incident planning", "Assume the primary cloud provider handles everything", "Disable all cloud logging"], "answer": 1, "explain": ["Excluding vendors creates coordination gaps.", "Correct. Roles and communication paths should be defined before an incident.", "Responsibilities are shared and contract-specific.", "Logging is necessary for monitoring and investigation."], "connections": ["hybrid-cloud"]}, {"id": "container", "obj": "3.1", "cat": "Compute Architecture", "title": "Application Container", "pages": "44–45 (PDF 53–54)", "heading": "Other Infrastructure Concepts", "type": "Architecture", "problem": "How can an application run in an isolated process without a complete guest operating system?", "plain": "An application container packages code and dependencies into an isolated process that shares the host operating-system kernel.", "analogy": "Application Container receives its own lesson because it has a distinct purpose and CompTIA decision clue.", "structure": [["Application code", "Performs the application function"], ["Dependencies", "Libraries and supporting files"], ["Container runtime", "Creates and isolates the process"], ["Host kernel", "Provides operating-system services"]], "flow": ["Package the application", "Start the container", "Apply isolation controls", "Run the application", "Monitor the container"], "why": ["Application Container addresses a specific architectural or security requirement.", "It performs a different function from the related concepts that previously shared its card.", "Its position, participants, or decision logic determine whether it works correctly.", "Its failure produces distinct evidence and a distinct security impact.", "CompTIA can test it independently through a best-answer scenario."], "issue": "A container runs with excessive privileges and modifies the host.", "evidence": "Container privileges, runtime configuration, host audit logs, process activity.", "fix": "Reduce privileges, harden the runtime, and validate isolation.", "q": "Which characteristic BEST describes an application container?", "choices": ["It normally shares the host kernel", "It always includes a complete guest OS", "It creates a physical air gap", "It replaces network segmentation"], "answer": 0, "explain": ["Correct. Containers usually share the host kernel.", "That describes a virtual machine more closely.", "Containers provide logical isolation.", "Segmentation remains necessary."], "connections": ["container-image", "virtualization", "microservices"]}, {"id": "container-image", "obj": "3.1", "cat": "Compute Architecture", "title": "Container Image", "pages": "44–45 (PDF 53–54)", "heading": "Other Infrastructure Concepts", "type": "Architecture", "problem": "How can the same application package be moved and started consistently in different environments?", "plain": "A container image is a portable, standardized package containing application code and required dependencies.", "analogy": "Container Image receives its own lesson because it has a distinct purpose and CompTIA decision clue.", "structure": [["Image definition", "Describes packaged content"], ["Image registry", "Stores and distributes images"], ["Runtime", "Creates a running container"], ["Version", "Identifies the approved package"]], "flow": ["Build the image", "Scan and approve it", "Store it in a registry", "Pull the image", "Start a container"], "why": ["Container Image addresses a specific architectural or security requirement.", "It performs a different function from the related concepts that previously shared its card.", "Its position, participants, or decision logic determine whether it works correctly.", "Its failure produces distinct evidence and a distinct security impact.", "CompTIA can test it independently through a best-answer scenario."], "issue": "An unapproved image containing a vulnerable library is deployed.", "evidence": "Image digest, registry history, software inventory, vulnerability scan.", "fix": "Remove the image, deploy an approved version, and enforce image controls.", "q": "What is the PRIMARY purpose of a container image?", "choices": ["Provide a portable application package", "Route traffic between VLANs", "Supply backup power", "Classify data"], "answer": 0, "explain": ["Correct. An image packages application code and dependencies.", "Routing is unrelated.", "Power resilience is unrelated.", "Classification is unrelated."], "connections": ["container", "microservices"]}, {"id": "virtualization", "obj": "3.1", "cat": "Compute Architecture", "title": "Virtualization", "pages": "44–45 (PDF 53–54)", "heading": "Other Infrastructure Concepts", "type": "Architecture", "problem": "How can several operating systems run independently on the same physical hardware?", "plain": "Virtualization uses a hypervisor to run multiple virtual machines, each with its own guest operating system and applications.", "analogy": "One apartment building contains separate apartments. They share the building but maintain separate living spaces.", "structure": [["Physical infrastructure", "Provides CPU, memory, storage, and networking"], ["Hypervisor", "Creates and manages virtual machines"], ["Guest operating system", "Runs inside each virtual machine"], ["Application", "Runs within its guest OS"]], "flow": ["Allocate physical resources", "Hypervisor creates VM", "Guest OS starts", "Application runs", "Hypervisor enforces separation"], "why": ["Hardware can be used efficiently.", "Each VM has its own OS boundary.", "Guest operating systems add overhead.", "The hypervisor becomes a critical trust layer.", "CompTIA compares virtualization with containers."], "issue": "A vulnerable hypervisor exposes several guest systems to risk.", "evidence": "Hypervisor logs, patch level, management access, VM behavior.", "fix": "Patch and harden the hypervisor, restrict management access, and assess affected guests.", "q": "Which component creates and manages virtual machines on shared hardware?", "choices": ["API gateway", "Hypervisor", "VLAN", "Load balancer"], "answer": 1, "explain": ["An API gateway routes application requests.", "Correct. The hypervisor manages virtual machines.", "A VLAN segments networks.", "A load balancer distributes traffic."], "connections": []}, {"id": "availability", "obj": "3.1", "cat": "Infrastructure Considerations", "title": "Availability", "pages": "45–46 (PDF 54–55)", "heading": "Infrastructure Considerations", "type": "Security property", "problem": "How can authorized users reliably access systems and data when needed?", "plain": "Availability is the security objective that keeps systems, services, and information accessible to authorized users.", "analogy": "Availability receives its own lesson because it has a distinct purpose and CompTIA decision clue.", "structure": [["Service", "Must remain accessible"], ["Authorized user", "Requires timely access"], ["Monitoring", "Detects interruption"], ["Recovery control", "Restores service"]], "flow": ["Define availability target", "Monitor service", "Detect interruption", "Restore access", "Measure results"], "why": ["Availability addresses a specific architectural or security requirement.", "It performs a different function from the related concepts that previously shared its card.", "Its position, participants, or decision logic determine whether it works correctly.", "Its failure produces distinct evidence and a distinct security impact.", "CompTIA can test it independently through a best-answer scenario."], "issue": "A protected application is unavailable for hours because no alternate service exists.", "evidence": "Uptime reports, outage logs, monitoring alerts, recovery records.", "fix": "Restore service and improve redundancy and recovery planning.", "q": "Which security objective is affected when authorized users cannot reach a required service?", "choices": ["Availability", "Confidentiality", "Non-repudiation", "Obfuscation"], "answer": 0, "explain": ["Correct. Availability concerns reliable access.", "Confidentiality concerns disclosure.", "Non-repudiation concerns proof of origin.", "Obfuscation hides meaning."], "connections": ["resilience", "mttr"]}, {"id": "mttr", "obj": "3.1", "cat": "Infrastructure Considerations", "title": "Mean Time to Repair", "pages": "45–46 (PDF 54–55)", "heading": "Infrastructure Considerations", "type": "Security property", "problem": "How can an organization measure the average time needed to restore a failed system?", "plain": "Mean Time to Repair (MTTR) measures the average time required to repair and restore service after failure.", "analogy": "Mean Time to Repair receives its own lesson because it has a distinct purpose and CompTIA decision clue.", "structure": [["Failure time", "When the outage begins"], ["Repair period", "Diagnosis and restoration"], ["Service restoration", "When operation resumes"], ["Average", "Calculated across incidents"]], "flow": ["Record failure", "Measure repair duration", "Restore service", "Collect multiple incidents", "Calculate the average"], "why": ["Mean Time to Repair addresses a specific architectural or security requirement.", "It performs a different function from the related concepts that previously shared its card.", "Its position, participants, or decision logic determine whether it works correctly.", "Its failure produces distinct evidence and a distinct security impact.", "CompTIA can test it independently through a best-answer scenario."], "issue": "Repair records are incomplete, making recovery performance impossible to measure.", "evidence": "Incident timestamps, service restoration time, maintenance records.", "fix": "Standardize incident timing and calculate MTTR from complete records.", "q": "Which metric measures average repair and restoration time?", "choices": ["MTTR", "RPO", "VLAN", "SLA"], "answer": 0, "explain": ["Correct. MTTR is Mean Time to Repair.", "RPO measures acceptable data loss.", "A VLAN segments networks.", "An SLA may contain targets but is not this metric."], "connections": ["availability"]}, {"id": "resilience", "obj": "3.1", "cat": "Infrastructure Considerations", "title": "Resilience", "pages": "45–46 (PDF 54–55)", "heading": "Infrastructure Considerations", "type": "Security property", "problem": "How can a system continue operating or recover after disruption?", "plain": "Resilience is the ability to withstand disruption, adapt, and restore acceptable operation.", "analogy": "Resilience receives its own lesson because it has a distinct purpose and CompTIA decision clue.", "structure": [["Disruption", "Failure or attack occurs"], ["Alternate capability", "Maintains essential operation"], ["Recovery process", "Restores normal service"], ["Improvement", "Reduces future impact"]], "flow": ["Anticipate disruption", "Maintain alternate capability", "Respond to failure", "Recover service", "Improve the design"], "why": ["Resilience addresses a specific architectural or security requirement.", "It performs a different function from the related concepts that previously shared its card.", "Its position, participants, or decision logic determine whether it works correctly.", "Its failure produces distinct evidence and a distinct security impact.", "CompTIA can test it independently through a best-answer scenario."], "issue": "A service returns after each outage but repeatedly suffers the same long interruption.", "evidence": "Incident timelines, dependency map, recovery records, recurring failure data.", "fix": "Correct the common failure point and improve recovery capability.", "q": "Which term BEST describes the ability to recover and continue after disruption?", "choices": ["Resilience", "Tokenization", "Authentication", "Data classification"], "answer": 0, "explain": ["Correct. Resilience addresses continuity and recovery.", "Tokenization protects data values.", "Authentication validates identity.", "Classification labels sensitivity."], "connections": ["availability"]}];
+
+/* ═══════════════════════════════════════════════════════════════════════
+   STATE & STORAGE
+═══════════════════════════════════════════════════════════════════════ */
+const SK='secplus-d3-v2';
+function loadState(){try{return JSON.parse(localStorage.getItem(SK))||{};}catch{return {};}}
+function saveState(s){localStorage.setItem(SK,JSON.stringify(s));}
+let state=loadState();
+let currentLesson=null, currentMode='build', buildStep=0, processStep=0, whyStep=0, investigateStep=0;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════════════════ */
+const screens=['start','dashboard','lesson','map','coverage','progress'];
+function showScreen(id){
+  screens.forEach(s=>{
+    document.getElementById(s).classList.toggle('active',s===id);
+  });
+  document.querySelectorAll('.navbtn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.screen===id);
+  });
+  if(id==='dashboard')renderDashboard();
+  if(id==='map')renderMap();
+  if(id==='coverage')renderCoverage();
+  if(id==='progress')renderProgress();
+}
+document.querySelectorAll('.navbtn').forEach(b=>{
+  b.addEventListener('click',()=>showScreen(b.dataset.screen));
+});
+document.getElementById('enterBtn').addEventListener('click',()=>showScreen('dashboard'));
+document.getElementById('backBtn').addEventListener('click',()=>showScreen('dashboard'));
+
+/* ═══════════════════════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════════════════════ */
+function esc(s){
+  if(s==null)return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function isDone(id){return !!(state[id]&&state[id].done);}
+function completedCount(){return lessons.filter(l=>isDone(l.id)).length;}
+function pct(){return lessons.length?Math.round(completedCount()/lessons.length*100):0;}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════════════════════════ */
+function renderDashboard(){
+  const p=pct(), done=completedCount();
+  document.getElementById('dashBar').style.width=p+'%';
+  document.getElementById('dashProgressPct').textContent=p+'%';
+  document.getElementById('dashProgress').textContent=done+' of '+lessons.length+' lessons completed';
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  const f=document.getElementById('filter').value;
+  const filtered=lessons.filter(l=>{
+    const matchQ=!q||[l.title,l.cat,l.plain,l.problem].some(t=>t&&t.toLowerCase().includes(q));
+    const matchF=f==='all'||(f==='complete'&&isDone(l.id))||(f==='incomplete'&&!isDone(l.id));
+    return matchQ&&matchF;
+  });
+  const grid=document.getElementById('lessonGrid');
+  if(!filtered.length){grid.innerHTML='<p class="small" style="padding:1rem">No lessons match your search.</p>';return;}
+  grid.innerHTML=filtered.map(l=>`
+    <div class="card${isDone(l.id)?' done':''}" data-id="${esc(l.id)}">
+      <div class="card-header">
+        <div class="card-title">${esc(l.title)}</div>
+        ${isDone(l.id)?'<span class="badge done-badge">✓ Done</span>':''}
+      </div>
+      <div>
+        <span class="badge obj">Obj ${esc(l.obj)}</span>
+        <span class="badge type">${esc(l.type)}</span>
+      </div>
+      <div class="card-meta">${esc(l.cat)}</div>
+      <p style="font-size:.85rem;color:var(--ink2);line-height:1.45">${esc(l.problem)}</p>
+      <div class="card-footer">
+        <span class="small">p. ${esc(l.pages)}</span>
+        <button class="start-btn" data-id="${esc(l.id)}">Start Lesson →</button>
+      </div>
+    </div>`).join('');
+  grid.querySelectorAll('[data-id]').forEach(el=>{
+    el.addEventListener('click',e=>{
+      const id=el.dataset.id||e.target.closest('[data-id]')?.dataset.id;
+      if(id)openLesson(id);
+    });
+  });
+}
+document.getElementById('search').addEventListener('input',renderDashboard);
+document.getElementById('filter').addEventListener('change',renderDashboard);
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LESSON VIEW
+═══════════════════════════════════════════════════════════════════════ */
+const modeIcons={build:'🏗️',process:'⚙️',why:'🔍',investigate:'🚨',exam:'📝'};
+const modeLabels={build:'Build It',process:'How It Works',why:'Why It Matters',investigate:'Investigate',exam:'Exam Coach'};
+
+function openLesson(id){
+  const l=lessons.find(x=>x.id===id);
+  if(!l)return;
+  currentLesson=l;
+  currentMode='build';
+  buildStep=0;processStep=0;whyStep=0;investigateStep=0;
+  // Breadcrumb
+  document.getElementById('lessonBreadcrumb').textContent=l.cat+' › '+l.title;
+  // Header card
+  document.getElementById('lessonHead').innerHTML=`
+    <div class="lesson-header-card">
+      <div class="lh-badges">
+        <span class="badge obj">Obj ${esc(l.obj)}</span>
+        <span class="badge type">${esc(l.type)}</span>
+        ${isDone(l.id)?'<span class="badge done-badge">✓ Completed</span>':''}
+      </div>
+      <h2>${esc(l.title)}</h2>
+      <div class="lh-meta">
+        <span>📂 ${esc(l.cat)}</span>
+        <span>📄 ${esc(l.heading)}</span>
+        <span>📖 p. ${esc(l.pages)}</span>
+      </div>
+    </div>`;
+  // Mode bar
+  const mb=document.getElementById('modebar');
+  mb.innerHTML=['build','process','why','investigate','exam'].map(m=>`
+    <button class="modebtn${m===currentMode?' active':''}" data-mode="${m}">
+      ${modeIcons[m]} ${modeLabels[m]}
+    </button>`).join('');
+  mb.querySelectorAll('.modebtn').forEach(b=>{
+    b.addEventListener('click',()=>{currentMode=b.dataset.mode;renderMode();updateModebar();});
+  });
+  renderMode();
+  renderSidebar();
+  showScreen('lesson');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateModebar(){
+  document.querySelectorAll('.modebtn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.mode===currentMode);
+  });
+}
+
+function renderMode(){
+  const l=currentLesson;
+  const el=document.getElementById('lessonContent');
+  if(currentMode==='build')renderBuild(l,el);
+  else if(currentMode==='process')renderProcess(l,el);
+  else if(currentMode==='why')renderWhy(l,el);
+  else if(currentMode==='investigate')renderInvestigate(l,el);
+  else if(currentMode==='exam')renderExam(l,el);
+}
+
+/* ── BUILD MODE ── */
+const buildSteps=[
+  {key:'problem',label:'The Problem',icon:'❓'},
+  {key:'plain',label:'Core Idea',icon:'💡'},
+  {key:'analogy',label:'Think of It Like…',icon:'🔗'},
+  {key:'structure',label:'Key Participants',icon:'🧩'},
+  {key:'flow',label:'How It Flows',icon:'➡️'},
+  {key:'why',label:'Why It Matters',icon:'🎯'},
+  {key:'issue',label:'What Goes Wrong',icon:'⚠️'},
+  {key:'exam',label:'Exam Prep',icon:'📝'},
+];
+function renderBuild(l,el){
+  const total=buildSteps.length;
+  const s=buildSteps[buildStep];
+  let content='';
+  if(s.key==='problem'){
+    content=`<div class="callout blue"><div class="callout-label">The Problem to Solve</div><p>${esc(l.problem)}</p></div>`;
+  } else if(s.key==='plain'){
+    content=`<div class="callout yellow"><div class="callout-label">Core Idea</div><p>${esc(l.plain)}</p></div>`;
+  } else if(s.key==='analogy'){
+    content=`<div class="callout green"><div class="callout-label">Analogy / Context</div><p>${esc(l.analogy)}</p></div>`;
+  } else if(s.key==='structure'){
+    content=`<table><thead><tr><th>Component</th><th>Role</th></tr></thead><tbody>
+      ${(l.structure||[]).map(r=>`<tr><td><strong>${esc(r[0])}</strong></td><td>${esc(r[1])}</td></tr>`).join('')}
+    </tbody></table>`;
+  } else if(s.key==='flow'){
+    content=`<div class="flow">${(l.flow||[]).map((f,i)=>`
+      ${i>0?'<span class="arrow">→</span>':''}
+      <div class="node">${esc(f)}</div>`).join('')}</div>`;
+  } else if(s.key==='why'){
+    content=`<ul style="padding-left:1.2rem;display:flex;flex-direction:column;gap:.5rem">
+      ${(l.why||[]).map(w=>`<li style="color:var(--ink2);font-size:.92rem">${esc(w)}</li>`).join('')}
+    </ul>`;
+  } else if(s.key==='issue'){
+    content=`
+      <div class="callout rust"><div class="callout-label">⚠️ What Goes Wrong</div><p>${esc(l.issue)}</p></div>
+      <div class="callout yellow"><div class="callout-label">🔎 Evidence to Look For</div><p>${esc(l.evidence)}</p></div>
+      <div class="callout green"><div class="callout-label">✅ How to Fix It</div><p>${esc(l.fix)}</p></div>`;
+  } else if(s.key==='exam'){
+    content=`<div class="callout blue"><div class="callout-label">📝 Exam Prep Tip</div>
+      <p>You've built the full picture of <strong>${esc(l.title)}</strong>. Switch to <strong>Exam Coach</strong> mode to test your knowledge with a CompTIA-style question.</p></div>`;
+  }
+  el.innerHTML=`
+    <div class="mode-title">${s.icon} ${esc(s.label)}</div>
+    ${renderStepIndicator(buildStep,total)}
+    ${content}
+    ${renderStepNav(buildStep,total,'build')}`;
+  el.querySelectorAll('.btn-step').forEach(b=>{
+    b.addEventListener('click',()=>{
+      if(b.dataset.dir==='prev'&&buildStep>0)buildStep--;
+      else if(b.dataset.dir==='next'&&buildStep<total-1)buildStep++;
+      renderMode();
+    });
+  });
+}
+
+/* ── PROCESS MODE ── */
+function renderProcess(l,el){
+  const steps=l.flow||[];
+  const total=steps.length;
+  if(!total){el.innerHTML='<p class="small">No process steps available.</p>';return;}
+  const step=steps[processStep];
+  el.innerHTML=`
+    <div class="mode-title">⚙️ How It Works — Step ${processStep+1} of ${total}</div>
+    ${renderStepIndicator(processStep,total)}
+    <div class="callout blue" style="margin-top:.5rem">
+      <div class="callout-label">Step ${processStep+1}</div>
+      <p style="font-size:1rem;font-weight:600">${esc(step)}</p>
+    </div>
+    <div class="flow" style="margin-top:.75rem">
+      ${steps.map((s,i)=>`
+        ${i>0?'<span class="arrow">→</span>':''}
+        <div class="node${i===processStep?' highlight':''}">${esc(s)}</div>`).join('')}
+    </div>
+    ${renderStepNav(processStep,total,'process')}`;
+  el.querySelectorAll('.btn-step').forEach(b=>{
+    b.addEventListener('click',()=>{
+      if(b.dataset.dir==='prev'&&processStep>0)processStep--;
+      else if(b.dataset.dir==='next'&&processStep<total-1)processStep++;
+      renderMode();
+    });
+  });
+}
+
+/* ── WHY MODE ── */
+function renderWhy(l,el){
+  const items=l.why||[];
+  const total=items.length;
+  if(!total){el.innerHTML='<p class="small">No why-chain available.</p>';return;}
+  el.innerHTML=`
+    <div class="mode-title">🔍 Why It Matters</div>
+    <div style="display:flex;flex-direction:column;gap:.6rem;margin-top:.5rem">
+      ${items.map((w,i)=>`
+        <div class="callout${i===0?' rust':i===1?' yellow':i===2?' blue':' green'}" style="display:flex;gap:.75rem;align-items:flex-start">
+          <span style="font-size:1rem;font-weight:800;color:var(--rust);min-width:24px">${i+1}.</span>
+          <p style="margin:0">${esc(w)}</p>
+        </div>`).join('')}
+    </div>`;
+}
+
+/* ── INVESTIGATE MODE ── */
+function renderInvestigate(l,el){
+  el.innerHTML=`
+    <div class="mode-title">🚨 Investigate the Failure</div>
+    <div class="callout rust" style="margin-top:.5rem">
+      <div class="callout-label">⚠️ The Issue</div>
+      <p>${esc(l.issue)}</p>
+    </div>
+    <div class="callout yellow">
+      <div class="callout-label">🔎 Evidence to Collect</div>
+      <p>${esc(l.evidence)}</p>
+    </div>
+    <div class="callout green">
+      <div class="callout-label">🛠️ Remediation</div>
+      <p>${esc(l.fix)}</p>
+    </div>
+    <div class="callout blue">
+      <div class="callout-label">🧩 Participants Involved</div>
+      <table style="margin:0"><thead><tr><th>Component</th><th>Role</th></tr></thead><tbody>
+        ${(l.structure||[]).map(r=>`<tr><td><strong>${esc(r[0])}</strong></td><td>${esc(r[1])}</td></tr>`).join('')}
+      </tbody></table>
+    </div>`;
+}
+
+/* ── EXAM MODE ── */
+function renderExam(l,el){
+  const ls=state[l.id]||{};
+  const answered=ls.answered!=null;
+  const letters=['A','B','C','D','E','F'];
+  el.innerHTML=`
+    <div class="mode-title">📝 Exam Coach</div>
+    <div class="callout blue" style="margin-bottom:1rem">
+      <div class="callout-label">CompTIA-Style Question</div>
+      <p style="font-size:.95rem;font-weight:600;color:var(--ink)">${esc(l.q)}</p>
+    </div>
+    <div class="choices-list">
+      ${l.choices.map((c,i)=>{
+        let cls='choice';
+        if(answered){
+          if(i===l.answer)cls+=' correct';
+          else if(i===ls.answered)cls+=' wrong';
+        }
+        return `<button class="choice${answered?' ':' '}" data-idx="${i}"${answered?' disabled':''}>
+          <span class="choice-letter">${letters[i]}</span>
+          <span>${esc(c)}</span>
+        </button>`;
+      }).join('')}
+    </div>
+    ${answered?`<div class="explain-box">
+      <strong>${i===l.answer?'✅ Correct!':'❌ Incorrect.'}</strong>
+      ${l.explain.map((e,i)=>`<p style="margin-top:.3rem"><strong>${letters[i]}.</strong> ${esc(e)}</p>`).join('')}
+    </div>`:''}`;
+  // Fix the answered rendering — re-render with correct state
+  if(answered){
+    el.querySelectorAll('.choice').forEach((btn,i)=>{
+      if(i===l.answer)btn.classList.add('correct');
+      else if(i===ls.answered)btn.classList.add('wrong');
+      btn.disabled=true;
+    });
+    const expBox=el.querySelector('.explain-box');
+    if(expBox){
+      expBox.innerHTML=`<strong>${ls.answered===l.answer?'✅ Correct!':'❌ Incorrect — the right answer is '+letters[l.answer]+'.'}</strong>`
+        +l.explain.map((e,i)=>`<p style="margin-top:.3rem"><strong>${letters[i]}.</strong> ${esc(e)}</p>`).join('');
+    }
+  }
+  el.querySelectorAll('.choice:not([disabled])').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const idx=parseInt(btn.dataset.idx);
+      if(!state[l.id])state[l.id]={};
+      state[l.id].answered=idx;
+      if(idx===l.answer)state[l.id].correct=(state[l.id].correct||0)+1;
+      state[l.id].attempts=(state[l.id].attempts||0)+1;
+      saveState();
+      renderMode();
+    });
+  });
+}
+
+/* ── STEP HELPERS ── */
+function renderStepIndicator(current,total){
+  if(total<=1)return '';
+  return `<div class="step-indicator">
+    ${Array.from({length:total},(_,i)=>`
+      ${i>0?'<div class="step-line"></div>':''}
+      <div class="step-dot${i===current?' active':i<current?' done':''}">${i+1}</div>`).join('')}
+  </div>`;
+}
+function renderStepNav(current,total,mode){
+  return `<div class="stepnav">
+    <button class="btn-step" data-dir="prev"${current===0?' disabled':''}>← Previous</button>
+    <span class="small">${current+1} / ${total}</span>
+    <button class="btn-step primary" data-dir="next"${current===total-1?' disabled':''}>Next →</button>
+  </div>`;
+}
+
+/* ── SIDEBAR ── */
+function renderSidebar(){
+  const l=currentLesson;
+  const ls=state[l.id]||{};
+  const rel=(l.connections||[]).map(id=>lessons.find(x=>x.id===id)).filter(Boolean);
+  const selfCheck=[
+    'Can you explain this concept in one sentence?',
+    'What is the most common misconfiguration?',
+    'How would you identify this on the CompTIA exam?',
+    'What evidence would you look for in a real incident?',
+  ];
+  document.getElementById('sidebar').innerHTML=`
+    <h3>Source Alignment</h3>
+    <div class="source-row"><strong>Objective:</strong> ${esc(l.obj)}</div>
+    <div class="source-row"><strong>Heading:</strong> ${esc(l.heading)}</div>
+    <div class="source-row"><strong>Pages:</strong> ${esc(l.pages)}</div>
+    <div class="divider"></div>
+    <h3>Connected Concepts</h3>
+    ${rel.length?rel.map(r=>`<button class="linkbtn" data-id="${esc(r.id)}">${esc(r.title)}</button>`).join(''):'<p class="small">No linked lessons.</p>'}
+    <div class="divider"></div>
+    <h3>Self-Check</h3>
+    <ul class="self-check-list">${selfCheck.map(q=>`<li>${esc(q)}</li>`).join('')}</ul>
+    <div class="divider"></div>
+    <button class="complete-btn${isDone(l.id)?' done':''}" id="completeBtn">
+      ${isDone(l.id)?'✓ Mark Incomplete':'Mark as Complete'}
+    </button>`;
+  document.getElementById('completeBtn').addEventListener('click',()=>{
+    if(!state[l.id])state[l.id]={};
+    state[l.id].done=!state[l.id].done;
+    saveState();
+    renderSidebar();
+    // Update header badge
+    const hd=document.getElementById('lessonHead');
+    const badge=hd.querySelector('.done-badge');
+    if(isDone(l.id)&&!badge){
+      hd.querySelector('.lh-badges').insertAdjacentHTML('beforeend','<span class="badge done-badge">✓ Completed</span>');
+    } else if(!isDone(l.id)&&badge){badge.remove();}
+  });
+  document.getElementById('sidebar').querySelectorAll('.linkbtn').forEach(b=>{
+    b.addEventListener('click',()=>openLesson(b.dataset.id));
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MAP
+═══════════════════════════════════════════════════════════════════════ */
+function renderMap(){
+  document.getElementById('mapGrid').innerHTML=lessons.map(l=>`
+    <div class="card" data-id="${esc(l.id)}" style="cursor:pointer">
+      <div class="card-header">
+        <div class="card-title">${esc(l.title)}</div>
+        ${isDone(l.id)?'<span class="badge done-badge">✓</span>':''}
+      </div>
+      <span class="badge obj">Obj ${esc(l.obj)}</span>
+      <p class="small">${(l.connections||[]).length} connection${(l.connections||[]).length!==1?'s':''}</p>
+    </div>`).join('');
+  document.getElementById('mapGrid').querySelectorAll('[data-id]').forEach(el=>{
+    el.addEventListener('click',()=>openLesson(el.dataset.id));
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   COVERAGE
+═══════════════════════════════════════════════════════════════════════ */
+function renderCoverage(){
+  const byObj={};
+  lessons.forEach(l=>{
+    if(!byObj[l.obj])byObj[l.obj]=[];
+    byObj[l.obj].push(l);
+  });
+  document.getElementById('coverageTables').innerHTML=Object.entries(byObj).map(([obj,ls])=>`
+    <h2 style="font-size:1rem;font-weight:700;margin:1.5rem 0 .5rem;color:var(--rust)">Objective ${esc(obj)}</h2>
+    <div class="panel" style="padding:0;overflow:hidden">
+    <table>
+      <thead><tr><th>Lesson</th><th>Category</th><th>Type</th><th>Pages</th><th>Status</th></tr></thead>
+      <tbody>${ls.map(l=>`<tr>
+        <td><button class="linkbtn" style="padding:0" data-id="${esc(l.id)}">${esc(l.title)}</button></td>
+        <td>${esc(l.cat)}</td>
+        <td>${esc(l.type)}</td>
+        <td>${esc(l.pages)}</td>
+        <td>${isDone(l.id)?'<span class="completeMark">✓ Done</span>':'<span class="small">—</span>'}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`).join('');
+  document.getElementById('coverageTables').querySelectorAll('.linkbtn').forEach(b=>{
+    b.addEventListener('click',()=>openLesson(b.dataset.id));
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PROGRESS
+═══════════════════════════════════════════════════════════════════════ */
+function renderProgress(){
+  const done=completedCount(), total=lessons.length, p=pct();
+  const attempts=Object.values(state).reduce((a,s)=>a+(s.attempts||0),0);
+  const correct=Object.values(state).reduce((a,s)=>a+(s.correct||0),0);
+  document.getElementById('progressMetrics').innerHTML=`
+    <div class="metric"><strong>${done}</strong><span>Completed</span></div>
+    <div class="metric"><strong>${total-done}</strong><span>Remaining</span></div>
+    <div class="metric"><strong>${p}%</strong><span>Progress</span></div>
+    <div class="metric"><strong>${attempts}</strong><span>Quiz Attempts</span></div>
+    <div class="metric"><strong>${correct}</strong><span>Correct Answers</span></div>`;
+  document.getElementById('progressBar').style.width=p+'%';
+  document.getElementById('progressPct').textContent=p+'%';
+  document.getElementById('progressText').textContent=done+' of '+total+' lessons completed · '+attempts+' quiz attempts · '+correct+' correct';
+}
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  if(confirm('Reset all progress? This cannot be undone.')){
+    state={};saveState();renderProgress();renderDashboard();
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════════════ */
+window._d3App={openLesson};
+</script>
+</body>
+</html>
